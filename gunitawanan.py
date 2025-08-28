@@ -22,7 +22,7 @@ except Exception:
 def get_attendees():
     """Fetches all names from the attendees table. Caches the result."""
     try:
-        rows = conn.query(table="attendees", columns=["Name"]).execute()
+        rows = conn.table("attendees").select("Name").execute()
         attendee_names = [record.get("Name") for record in rows.data if record.get("Name")]
         return attendee_names
     except Exception as e:
