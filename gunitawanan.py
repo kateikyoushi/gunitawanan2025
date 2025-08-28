@@ -165,7 +165,7 @@ with tab_main:
                         else:
                             st.error("Something went wrong. Please try again.")
                     else:
-                        st.warning("You have already registered with this name or email.")
+                        st.warning("Thank you for signing up for the event!")
                 else:
                     st.error("Please provide both your name and email. 🥺")
 
