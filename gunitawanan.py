@@ -3,11 +3,22 @@ from st_supabase_connection import SupabaseConnection
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="GunitaTawanan 2025",
-    page_icon="☀️",
-    layout="wide",
-    initial_sidebar_state="expanded"
+        page_title="GunitaTawanan 2025",
+        page_icon="☀️",
+        layout="wide",
+        initial_sidebar_state="expanded",
+        theme={
+                "base": "light"
+        }
 )
+
+# --- Fun Header Banner ---
+st.markdown("""
+<div style='background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%); padding: 2rem 1rem; border-radius: 1.5rem; text-align: center; margin-bottom: 2rem;'>
+    <h1 style='color: #fff; font-size: 3rem; margin-bottom: 0.5rem;'>GunitaTawanan 2025 🥳☀️</h1>
+    <h3 style='color: #fff; font-weight: 400;'>Your Ultimate Chill Reunion 🏖️</h3>
+</div>
+""", unsafe_allow_html=True)
 
 # --- Supabase Connection ---
 # The st.connection will securely load credentials from .streamlit/secrets.toml
@@ -38,16 +49,23 @@ def add_attendee(name, email):
         st.error(f"Failed to add attendee: {e}")
         return False
 
-# --- Header and Introduction ---
-st.title("GunitaTawanan 2025 🥳")
-st.subheader("Your Ultimate Chill Reunion 🏖️")
-st.markdown("---")
-st.info("🗓️ **August 30–31, 2025** |📍 **New Era Association | One Spatial Iloilo**")
-st.markdown("### Get ready for a weekend of good vibes, laughter, and making new memories! 🤩")
+
+st.info("🗓️ **August 30–31, 2025** | 📍 **New Era Association | One Spatial Iloilo**")
+st.markdown("""
+<div style='background: #fffbe7; border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem; border: 2px dashed #f9d423;'>
+<span style='font-size: 1.2rem;'>
+🎉 <b>Get ready for a weekend of good vibes, laughter, and making new memories!</b> 🤩<br>
+<span style='color: #ff4e50;'>Bring your best tawa and chill lang energy!</span>
+</span>
+</div>
+""", unsafe_allow_html=True)
+
 
 # --- Registration Form ---
 st.header("🎟️ Confirm Your Attendance")
-st.markdown("We can't wait to see you! Please enter your name and email to confirm you're coming. ✨")
+st.markdown("""
+<span style='font-size: 1.1rem;'>We can't wait to see you!<br>Enter your name and email to confirm you're coming. ✨</span>
+""", unsafe_allow_html=True)
 
 with st.form("attendance_form"):
     email = st.text_input("📧 Your Email Address")
@@ -59,6 +77,7 @@ with st.form("attendance_form"):
             if add_attendee(name, email):
                 st.success("Attendance confirmed! We'll see you there. 🥳")
                 st.balloons()
+                st.toast("Welcome to the reunion! 🎈", icon="🎉")
                 # Clear cache and rerun to update the sidebar list
                 st.cache_data.clear()
                 st.rerun()
@@ -69,8 +88,11 @@ with st.form("attendance_form"):
 
 st.markdown("---")
 
-# --- Itinerary Section ---
-st.header("📜 The Itinerary")
+st.markdown("""
+<div style='background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%); padding: 1rem; border-radius: 1rem; margin-top: 2rem; margin-bottom: 1rem;'>
+    <h2 style='color: #fff; margin: 0;'>📜 The Itinerary</h2>
+</div>
+""", unsafe_allow_html=True)
 st.markdown("Here's a look at what we have in store. Everything is totally optional—just come, be yourself, and have fun! 😊")
 st.markdown("### 🗓️ Day 1: August 30, 2025 (Saturday)")
 st.markdown("A day for reconnection, good food, and deep conversations. 💬")
@@ -113,20 +135,27 @@ st.markdown("---")
 
 # --- Sidebar ---
 with st.sidebar:
-    st.header("Who's Coming? 🎉")
-    st.markdown("---")
-    st.markdown("**Attendees:**")
-    
-    attendee_list = get_attendees()
-    if attendee_list:
-        for name in attendee_list:
-            st.write(f"✨ {name}")
-    else:
-        st.write("No one has confirmed yet. Be the first! ✨")
-    
-    st.markdown("---")
-    st.markdown("""
-    **Reminders:**
-    - Bring essentials, themed attire, food contributions, and your best tawa or “chill lang” energy 😂
-    - This is a safe, no-pressure, “be yourself” reunion—rest if you want, join the fun if you want! 💖
-    """)
+        st.markdown("""
+        <div style='background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%); padding: 1rem; border-radius: 1rem; margin-bottom: 1rem;'>
+            <h2 style='color: #fff; margin: 0;'>Who's Coming? 🎉</h2>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown("**Attendees:**")
+        attendee_list = get_attendees()
+        if attendee_list:
+                st.markdown(
+                        "<ul style='padding-left: 1.2em;'>" +
+                        "".join([f"<li style='font-size:1.1em; margin-bottom:0.3em;'>✨ <b>{name}</b></li>" for name in attendee_list]) +
+                        "</ul>", unsafe_allow_html=True)
+        else:
+                st.write("No one has confirmed yet. Be the first! ✨")
+        st.markdown("---")
+        st.markdown("""
+        <div style='background: #fffbe7; border-radius: 1rem; padding: 1rem; border: 2px dashed #f9d423;'>
+        <b>Reminders:</b><br>
+        <ul>
+            <li>Bring essentials, themed attire, food contributions, and your best tawa or “chill lang” energy 😂</li>
+            <li>This is a safe, no-pressure, “be yourself” reunion—rest if you want, join the fun if you want! 💖</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
