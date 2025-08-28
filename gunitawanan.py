@@ -82,113 +82,149 @@ with st.container():
 st.divider()
 
 # --- Registration Form ---
-st.header("🎟️ Confirm Your Attendance")
-st.write("We can't wait to see you! Enter your details to confirm you're coming. ✨")
 
-col1, col2 = st.columns(2)
-with col1:
-    with st.form("attendance_form"):
-        email = st.text_input("📧 Your Email Address", placeholder="your.email@example.com")
-        name = st.text_input("🙋‍♀️ Your Name", placeholder="Your full name")
-        submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary")
-
-        if submitted:
-            if email and name:
-                if add_attendee(name, email):
-                    st.success("🎊 Attendance confirmed! We'll see you there!")
-                    st.balloons()
-                    st.cache_data.clear()
-                    st.rerun()
-                else:
-                    st.error("Something went wrong. Please try again.")
-            else:
-                st.error("Please provide both your name and email. 🥺")
-
-# --- Attendees Dashboard ---
+# --- Tabs for Main and Attendance Visualizations ---
 attendee_list = get_attendees()
 num_attendees = len(attendee_list)
 max_participants = 10
 
-with col2:
-    st.subheader("👥 Registration Status")
-    
-    # Progress metrics
+tab_main, tab_attendance = st.tabs(["Event & Registration", "Attendance Dashboard"])
+
+with tab_main:
+    st.header("🎟️ Confirm Your Attendance")
+    st.write("We can't wait to see you! Enter your details to confirm you're coming. ✨")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.form("attendance_form"):
+            email = st.text_input("📧 Your Email Address", placeholder="your.email@example.com")
+            name = st.text_input("🙋‍♀️ Your Name", placeholder="Your full name")
+            submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary")
+
+            if submitted:
+                if email and name:
+                    if add_attendee(name, email):
+                        st.success("🎊 Attendance confirmed! We'll see you there!")
+                        st.balloons()
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        st.error("Something went wrong. Please try again.")
+                else:
+                    st.error("Please provide both your name and email. 🥺")
+
+    st.divider()
+
+    # --- Itinerary Section ---
+    st.header("🗓️ Event Itinerary")
+    st.subheader("📍 New Era Association | One Spatial Iloilo")
+
+    # Day 1 Tab
+    with st.expander("🌞 Day 1: August 30, 2025 (Saturday)", expanded=True):
+        day1_schedule = [
+            ("🛬 2:00 PM", "Arrival & Check-in", "Registration, welcome drinks, room assignment & orientation"),
+            ("🧳 2:30 PM", "Settling In & Free Time", "Unpack, settle, photo ops, vibe check"),
+            ("🎤 3:30 PM", "Opening Program", "Welcome remarks, icebreaker activities"),
+            ("🍪 4:30 PM", "Merienda & Chill Catch-up", "Snacks, drinks, and casual conversations"),
+            ("🎲 5:30 PM", "Group Activity (Optional)", "Throwback photo guessing game"),
+            ("🛏️ 6:00 PM", "Free Time / Room Prep", "Relax and prepare for dinner"),
+            ("🍽️ 7:00 PM", "Dinner", "Order your favorite cuisine, shared dining experience"),
+            ("💬 8:00 PM", "Debrief & Reflection", "Heartfelt conversations and life updates"),
+            ("🌙 10:00 PM", "Open Socials", "Pajama hangout, movies, games, or chill time"),
+            ("😴 12:00 MN", "Wind Down", "Quiet hours begin, optional late-night conversations")
+        ]
+        for time, activity, description in day1_schedule:
+            with st.container():
+                col_time, col_content = st.columns([1, 4])
+                with col_time:
+                    st.write(f"**{time}**")
+                with col_content:
+                    st.write(f"**{activity}**")
+                    st.caption(description)
+
+    # Day 2 Tab
+    with st.expander("🌅 Day 2: August 31, 2025 (Sunday)", expanded=False):
+        day2_schedule = [
+            ("🌅 7:00 AM", "Chill Wake-up & Breakfast", "Self-serve breakfast and morning coffee"),
+            ("🧘‍♂️ 8:00 AM", "Morning Activity (Optional)", "Stretching, walks, or pool relaxation"),
+            ("🏊 9:30 AM", "Free Time", "Swimming, packing, photos, final conversations"),
+            ("🥞 10:30 AM", "Brunch & Closing", "Group brunch, future letters, group photos"),
+            ("🚗 12:00 NN", "Checkout / Departure", "Final goodbyes and safe travels")
+        ]
+        for time, activity, description in day2_schedule:
+            with st.container():
+                col_time, col_content = st.columns([1, 4])
+                with col_time:
+                    st.write(f"**{time}**")
+                with col_content:
+                    st.write(f"**{activity}**")
+                    st.caption(description)
+
+with tab_attendance:
+    st.header("👥 Attendance Dashboard")
+    st.subheader("Registration Status")
     col_metric1, col_metric2 = st.columns(2)
     with col_metric1:
         st.metric("Confirmed", num_attendees, help="Number of confirmed attendees")
     with col_metric2:
         remaining = max_participants - num_attendees
         st.metric("Slots Left", remaining, delta=-1 if remaining < max_participants else 0)
-    
-    # Progress bar
     progress_percentage = min(num_attendees / max_participants, 1.0)
     st.progress(progress_percentage, text=f"{num_attendees}/{max_participants} slots filled")
-    
     if num_attendees >= max_participants:
         st.warning("🎉 Event is now full! Contact organizers for waitlist.")
     elif num_attendees > max_participants * 0.8:
         st.warning("⚡ Only a few spots left!")
 
-st.divider()
+    st.divider()
 
-# --- Visualization Section ---
-if num_attendees > 0:
-    st.subheader("📊 Fun Attendance Visualizations")
-    
-    viz_col1, viz_col2 = st.columns(2)
-    
-    with viz_col1:
-        st.write("**Registration Timeline**")
-        # Create a simple timeline chart
-        timeline_data = pd.DataFrame({
-            'Day': list(range(1, num_attendees + 1)),
-            'Cumulative Attendees': list(range(1, num_attendees + 1)),
-            'Names': attendee_list
-        })
-        
-        fig_timeline = px.line(timeline_data, x='Day', y='Cumulative Attendees',
-                              title="Registration Growth",
-                              markers=True, hover_data=['Names'])
-        fig_timeline.update_layout(height=300, showlegend=False)
-        st.plotly_chart(fig_timeline, use_container_width=True)
-    
-    with viz_col2:
-        st.write("**Attendance Gauge**")
-        # Create a gauge chart
-        fig_gauge = go.Figure(go.Indicator(
-            mode = "gauge+number+delta",
-            value = num_attendees,
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            title = {'text': "Confirmed Attendees"},
-            delta = {'reference': max_participants},
-            gauge = {
-                'axis': {'range': [None, max_participants]},
-                'bar': {'color': "orange"},
-                'steps': [
-                    {'range': [0, max_participants//2], 'color': "lightgray"},
-                    {'range': [max_participants//2, max_participants], 'color': "gray"}
-                ],
-                'threshold': {
-                    'line': {'color': "red", 'width': 4},
-                    'thickness': 0.75,
-                    'value': max_participants
+    if num_attendees > 0:
+        st.subheader("📊 Fun Attendance Visualizations")
+        viz_col1, viz_col2 = st.columns(2)
+        with viz_col1:
+            st.write("**Registration Timeline**")
+            timeline_data = pd.DataFrame({
+                'Day': list(range(1, num_attendees + 1)),
+                'Cumulative Attendees': list(range(1, num_attendees + 1)),
+                'Names': attendee_list
+            })
+            fig_timeline = px.line(timeline_data, x='Day', y='Cumulative Attendees',
+                                  title="Registration Growth",
+                                  markers=True, hover_data=['Names'])
+            fig_timeline.update_layout(height=300, showlegend=False)
+            st.plotly_chart(fig_timeline, use_container_width=True)
+        with viz_col2:
+            st.write("**Attendance Gauge**")
+            fig_gauge = go.Figure(go.Indicator(
+                mode = "gauge+number+delta",
+                value = num_attendees,
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Confirmed Attendees"},
+                delta = {'reference': max_participants},
+                gauge = {
+                    'axis': {'range': [None, max_participants]},
+                    'bar': {'color': "orange"},
+                    'steps': [
+                        {'range': [0, max_participants//2], 'color': "lightgray"},
+                        {'range': [max_participants//2, max_participants], 'color': "gray"}
+                    ],
+                    'threshold': {
+                        'line': {'color': "red", 'width': 4},
+                        'thickness': 0.75,
+                        'value': max_participants
+                    }
                 }
-            }
-        ))
-        fig_gauge.update_layout(height=300)
-        st.plotly_chart(fig_gauge, use_container_width=True)
-
-    # Attendee name visualization
-    st.write("**Who's Coming? 🎉**")
-    name_cols = st.columns(min(5, num_attendees))
-    for i, name in enumerate(attendee_list):
-        with name_cols[i % 5]:
-            st.success(f"✨ **{name}**")
-
-else:
-    st.info("🎯 Be the first to register and see your name here!")
-
-st.divider()
+            ))
+            fig_gauge.update_layout(height=300)
+            st.plotly_chart(fig_gauge, use_container_width=True)
+        st.write("**Who's Coming? 🎉**")
+        name_cols = st.columns(min(5, num_attendees))
+        for i, name in enumerate(attendee_list):
+            with name_cols[i % 5]:
+                st.success(f"✨ **{name}**")
+    else:
+        st.info("🎯 Be the first to register and see your name here!")
+    st.divider()
 
 # --- Itinerary Section ---
 st.header("🗓️ Event Itinerary")
