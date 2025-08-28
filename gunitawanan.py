@@ -138,7 +138,7 @@ with tab_main:
             submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary", disabled=duplicate)
 
             if duplicate and email and name:
-                st.warning("You have already registered with this name or email. Registration is disabled.")
+                st.warning("You have already registered with this name or email. Registration is disabled. Please refrain from overloading the database, Jayrose Bunda! FUCK YOU 🖕")
 
             if submitted:
                 if email and name:
