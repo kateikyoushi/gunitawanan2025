@@ -3,8 +3,7 @@ from st_supabase_connection import SupabaseConnection
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-from datetime import datetime
-import time # Add the time module
+from datetime import datetime, timedelta
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -36,21 +35,18 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Streamlit Native Countdown Timer (Top of Page) ---
+# --- Non-Blocking Countdown Timer (Top of Page) ---
 # Target: August 30, 2025, 2:00 PM PST (Philippine Standard Time)
-# Philippine Standard Time (PST) is UTC+8.
+# Current time in Roxas City, Western Visayas, Philippines (PST)
 EVENT_DATETIME = datetime(2025, 8, 30, 14, 0, 0)
-countdown_placeholder = st.empty()
+now = datetime.now()
+distance = EVENT_DATETIME - now
+total_seconds = int(distance.total_seconds())
 
-while True:
-    now = datetime.now()
-    distance = EVENT_DATETIME - now
-    total_seconds = int(distance.total_seconds())
-
-    if total_seconds <= 0:
-        countdown_placeholder.markdown("<div style='text-align:center;font-size:2rem;font-weight:bold;padding:1rem 0;color:#e67e22;'>🎉 The event has started!</div>", unsafe_allow_html=True)
-        break
-
+# Display the countdown
+if total_seconds <= 0:
+    st.markdown("<div style='text-align:center;font-size:2rem;font-weight:bold;padding:1rem 0;color:#e67e22;'>🎉 The event has started!</div>", unsafe_allow_html=True)
+else:
     days = total_seconds // (24 * 3600)
     hours = (total_seconds % (24 * 3600)) // 3600
     minutes = (total_seconds % 3600) // 60
@@ -64,8 +60,7 @@ while True:
             <span style="color:#f39c12">{seconds}</span> SECONDS
         </div>
     """
-    countdown_placeholder.markdown(countdown_text, unsafe_allow_html=True)
-    time.sleep(1) # Rerun the script every second to update the time
+    st.markdown(countdown_text, unsafe_allow_html=True)
 
 # --- Fun Header Banner ---
 st.markdown('<div class="main-header">', unsafe_allow_html=True)
