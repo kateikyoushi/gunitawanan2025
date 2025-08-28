@@ -60,8 +60,6 @@ else:
         </div>
     """
     st.markdown(countdown_text, unsafe_allow_html=True)
-    # Add a small note about when the timer updates to manage user expectations
-    st.info("The countdown updates when the page reloads or you interact with the app. ✨")
 
 # --- Fun Header Banner ---
 st.markdown('<div class="main-header">', unsafe_allow_html=True)
