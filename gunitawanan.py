@@ -13,26 +13,55 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+
 # --- Custom CSS for better styling ---
 st.markdown("""
 <style>
 .main-header {
-    text-align: center;
-    padding: 2rem 0;
+        text-align: center;
+        padding: 2rem 0;
 }
 .event-info {
-    text-align: center;
-    padding: 1rem;
-    margin: 1rem 0;
+        text-align: center;
+        padding: 1rem;
+        margin: 1rem 0;
 }
 .attendee-card {
-    padding: 0.5rem;
-    margin: 0.25rem;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: bold;
+        padding: 0.5rem;
+        margin: 0.25rem;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: bold;
 }
 </style>
+""", unsafe_allow_html=True)
+
+# --- Animated Countdown Timer (Top of Page) ---
+st.markdown("""
+<div id='countdown' style='text-align:center;font-size:2rem;font-weight:bold;padding:1rem 0;color:#e67e22;'></div>
+<script>
+function updateCountdown() {
+    // Target: August 30, 2025, 2:00 PM PST (convert to UTC: 2025-08-30T21:00:00Z)
+    var eventDate = new Date('2025-08-30T21:00:00Z').getTime();
+    var now = new Date().getTime();
+    var distance = eventDate - now;
+    if (distance < 0) {
+        document.getElementById('countdown').innerHTML = '🎉 The event has started!';
+        return;
+    }
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    document.getElementById('countdown').innerHTML =
+        '<span style="color:#f39c12">' + days + '</span> DAYS '
+        + '<span style="color:#f39c12">' + hours + '</span> HOURS '
+        + '<span style="color:#f39c12">' + minutes + '</span> MINUTES '
+        + '<span style="color:#f39c12">' + seconds + '</span> SECONDS';
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
 """, unsafe_allow_html=True)
 
 # --- Fun Header Banner ---
@@ -102,63 +131,45 @@ with tab_main:
             submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary")
 
             if submitted:
-                if email and name:
-                    if add_attendee(name, email):
-                        st.success("🎊 Attendance confirmed! We'll see you there!")
-                        st.balloons()
-                        st.cache_data.clear()
-                        st.rerun()
-                    else:
-                        st.error("Something went wrong. Please try again.")
-                else:
-                    st.error("Please provide both your name and email. 🥺")
+                                if email and name:
+                                        if add_attendee(name, email):
+                                                st.success("🎊 Attendance confirmed! We'll see you there!")
+                                                # Balloons for PC, fallback for mobile
+                                                st.balloons()
+                                                st.markdown('''<script>
+                                                // fallback confetti for mobile
+                                                if (/Mobi|Android/i.test(navigator.userAgent)) {
+                                                    let c = document.createElement('canvas');
+                                                    c.style.position = 'fixed';c.style.left=0;c.style.top=0;c.style.width='100vw';c.style.height='100vh';c.style.pointerEvents='none';c.id='confetti-canvas';
+                                                    document.body.appendChild(c);
+                                                    let ctx = c.getContext('2d');
+                                                    let w = window.innerWidth, h = window.innerHeight;
+                                                    c.width = w; c.height = h;
+                                                    let confetti = Array.from({length:100},()=>({x:Math.random()*w,y:Math.random()*-h,vx:Math.random()*2-1,vy:Math.random()*3+2,color:`hsl(${Math.random()*360},70%,60%)`}));
+                                                    let t=0;
+                                                    function draw(){
+                                                        ctx.clearRect(0,0,w,h);
+                                                        confetti.forEach(f=>{
+                                                            ctx.beginPath();ctx.arc(f.x,f.y,6,0,2*Math.PI);
+                                                            ctx.fillStyle=f.color;ctx.fill();
+                                                            f.x+=f.vx;f.y+=f.vy;
+                                                            if(f.y>h){f.y=Math.random()*-h;f.x=Math.random()*w;}
+                                                        });
+                                                        t++;
+                                                        if(t<100)requestAnimationFrame(draw);else c.remove();
+                                                    }
+                                                    draw();
+                                                }
+                                                </script>''', unsafe_allow_html=True)
+                                                st.cache_data.clear()
+                                                st.rerun()
+                                        else:
+                                                st.error("Something went wrong. Please try again.")
+                                else:
+                                        st.error("Please provide both your name and email. 🥺")
+
 
     st.divider()
-
-    # --- Itinerary Section ---
-    st.header("🗓️ Event Itinerary")
-    st.subheader("📍 New Era Association | One Spatial Iloilo")
-
-    # Day 1 Tab
-    with st.expander("🌞 Day 1: August 30, 2025 (Saturday)", expanded=True):
-        day1_schedule = [
-            ("🛬 2:00 PM", "Arrival & Check-in", "Registration, welcome drinks, room assignment & orientation"),
-            ("🧳 2:30 PM", "Settling In & Free Time", "Unpack, settle, photo ops, vibe check"),
-            ("🎤 3:30 PM", "Opening Program", "Welcome remarks, icebreaker activities"),
-            ("🍪 4:30 PM", "Merienda & Chill Catch-up", "Snacks, drinks, and casual conversations"),
-            ("🎲 5:30 PM", "Group Activity (Optional)", "Throwback photo guessing game"),
-            ("🛏️ 6:00 PM", "Free Time / Room Prep", "Relax and prepare for dinner"),
-            ("🍽️ 7:00 PM", "Dinner", "Order your favorite cuisine, shared dining experience"),
-            ("💬 8:00 PM", "Debrief & Reflection", "Heartfelt conversations and life updates"),
-            ("🌙 10:00 PM", "Open Socials", "Pajama hangout, movies, games, or chill time"),
-            ("😴 12:00 MN", "Wind Down", "Quiet hours begin, optional late-night conversations")
-        ]
-        for time, activity, description in day1_schedule:
-            with st.container():
-                col_time, col_content = st.columns([1, 4])
-                with col_time:
-                    st.write(f"**{time}**")
-                with col_content:
-                    st.write(f"**{activity}**")
-                    st.caption(description)
-
-    # Day 2 Tab
-    with st.expander("🌅 Day 2: August 31, 2025 (Sunday)", expanded=False):
-        day2_schedule = [
-            ("🌅 7:00 AM", "Chill Wake-up & Breakfast", "Self-serve breakfast and morning coffee"),
-            ("🧘‍♂️ 8:00 AM", "Morning Activity (Optional)", "Stretching, walks, or pool relaxation"),
-            ("🏊 9:30 AM", "Free Time", "Swimming, packing, photos, final conversations"),
-            ("🥞 10:30 AM", "Brunch & Closing", "Group brunch, future letters, group photos"),
-            ("🚗 12:00 NN", "Checkout / Departure", "Final goodbyes and safe travels")
-        ]
-        for time, activity, description in day2_schedule:
-            with st.container():
-                col_time, col_content = st.columns([1, 4])
-                with col_time:
-                    st.write(f"**{time}**")
-                with col_content:
-                    st.write(f"**{activity}**")
-                    st.caption(description)
 
 with tab_attendance:
     st.header("👥 Attendance Dashboard")
