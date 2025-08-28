@@ -132,11 +132,28 @@ with tab_main:
             if submitted:
                 if email and name:
                     if add_attendee(name, email):
-                        # Show the confirmation overlay message
-                        st.success("🎊 **Attendance Confirmed!** Please refrain from overloading the database, Jayrose Bunda FUCK YOU!")
+                        # Try to use Streamlit popup/modal if available, else fallback to message and button
+                        try:
+                            import streamlit_extras
+                            from streamlit_extras.st_modal import st_modal
+                            with st_modal("Attendance Confirmed!"):
+                                st.success("🎊 **Attendance Confirmed!** Please refrain from overloading the database, Jayrose Bunda FUCK YOU!")
+                                if st.button("Noted", key="noted_btn_modal"):
+                                    st.cache_data.clear()
+                                    st.rerun()
+                        except Exception:
+                            st.markdown("""
+                            <div style='border:2px solid #f39c12; border-radius:10px; background:#fffbe6; padding:1.5rem; margin:1rem 0; text-align:center;'>
+                                <span style='font-size:2rem;'>🎊</span><br>
+                                <b>Attendance Confirmed!</b><br>
+                                Please refrain from overloading the database, Jayrose Bunda FUCK YOU!
+                            </div>
+                            """, unsafe_allow_html=True)
+                            if st.button("Noted", key="noted_btn_fallback"):
+                                st.cache_data.clear()
+                                st.rerun()
                         st.balloons()
-                        st.cache_data.clear()
-                        st.rerun()
+                        st.stop()
                     else:
                         st.error("Something went wrong. Please try again.")
                 else:
