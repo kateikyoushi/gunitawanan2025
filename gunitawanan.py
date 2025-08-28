@@ -124,52 +124,52 @@ with tab_main:
 
     col1, col2 = st.columns(2)
     with col1:
-        # Prevent duplicate registration by checking if name or email already exists
-        email = st.text_input("📧 Your Email Address", placeholder="your.email@example.com")
-        name = st.text_input("🙋‍♀️ Your Name", placeholder="Your full name")
-        attendee_emails = []
-        try:
-            rows = conn.table("attendees").select("Email").execute()
-            attendee_emails = [record.get("Email", "").strip().lower() for record in rows.data if record.get("Email")]
-        except Exception:
-            pass
-        attendee_names = [n.strip().lower() for n in attendee_list]
-        duplicate = (email.strip().lower() in attendee_emails) or (name.strip().lower() in attendee_names)
-        submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary", disabled=duplicate)
+        with st.form("attendance_form"):
+            email = st.text_input("📧 Your Email Address", placeholder="your.email@example.com")
+            name = st.text_input("🙋‍♀️ Your Name", placeholder="Your full name")
+            attendee_emails = []
+            try:
+                rows = conn.table("attendees").select("Email").execute()
+                attendee_emails = [record.get("Email", "").strip().lower() for record in rows.data if record.get("Email")]
+            except Exception:
+                pass
+            attendee_names = [n.strip().lower() for n in attendee_list]
+            duplicate = (email.strip().lower() in attendee_emails) or (name.strip().lower() in attendee_names)
+            submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary", disabled=duplicate)
 
-        if duplicate and email and name:
-            st.warning("You have already registered with this name or email. Registration is disabled.")
+            if duplicate and email and name:
+                st.warning("You have already registered with this name or email. Registration is disabled.")
 
-        if submitted:
-            if email and name:
-                if not duplicate:
-                    if add_attendee(name, email):
-                        # Confirmation message (no button in fallback, not in form)
-                        try:
-                            import streamlit_extras
-                            from streamlit_extras.st_modal import st_modal
-                            with st_modal("Attendance Confirmed!"):
-                                st.success("🎊 **Attendance Confirmed!** Please refrain from overloading the database, Jayrose Bunda! FUCK YOU 🖕!")
-                                if st.button("Noted", key="noted_btn_modal"):
-                                    st.cache_data.clear()
-                                    st.rerun()
-                        except Exception:
-                            st.markdown("""
-                            <div style='border:2px solid #f39c12; border-radius:10px; background:#fffbe6; padding:1.5rem; margin:1rem 0; text-align:center;'>
-                                <span style='font-size:2rem;'>🎊</span><br>
-                                <b>Attendance Confirmed!</b><br>
-                                Please refrain from overloading the database, Jayrose Bunda!
-                            </div>
-                            """, unsafe_allow_html=True)
-                        st.balloons()
-                        st.cache_data.clear()
-                        st.rerun()
+            if submitted:
+                if email and name:
+                    if not duplicate:
+                        if add_attendee(name, email):
+                            # Confirmation message (no button in fallback, not in form)
+                            try:
+                                import streamlit_extras
+                                from streamlit_extras.st_modal import st_modal
+                                with st_modal("Attendance Confirmed!"):
+                                    st.success("🎊 **Attendance Confirmed!** Please refrain from overloading the database, Jayrose Bunda! FUCK YOU 🖕")
+                                    if st.button("Noted", key="noted_btn_modal"):
+                                        st.cache_data.clear()
+                                        st.rerun()
+                            except Exception:
+                                st.markdown("""
+                                <div style='border:2px solid #f39c12; border-radius:10px; background:#fffbe6; padding:1.5rem; margin:1rem 0; text-align:center;'>
+                                    <span style='font-size:2rem;'>🎊</span><br>
+                                    <b>Attendance Confirmed!</b><br>
+                                    Please refrain from overloading the database, Jayrose Bunda!
+                                </div>
+                                """, unsafe_allow_html=True)
+                            st.balloons()
+                            st.cache_data.clear()
+                            st.rerun()
+                        else:
+                            st.error("Something went wrong. Please try again.")
                     else:
-                        st.error("Something went wrong. Please try again.")
+                        st.warning("You have already registered with this name or email.")
                 else:
-                    st.warning("You have already registered with this name or email.")
-            else:
-                st.error("Please provide both your name and email. 🥺")
+                    st.error("Please provide both your name and email. 🥺")
 
     st.divider()
 
