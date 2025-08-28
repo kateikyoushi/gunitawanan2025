@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 from datetime import datetime
+import time # Add the time module
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -12,7 +13,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
 
 # --- Custom CSS for better styling ---
 st.markdown("""
@@ -36,33 +36,36 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Animated Countdown Timer (Top of Page) ---
-st.markdown("""
-<div id='countdown' style='text-align:center;font-size:2rem;font-weight:bold;padding:1rem 0;color:#e67e22;'></div>
-<script>
-function updateCountdown() {
-    // Target: August 30, 2025, 2:00 PM PST (convert to UTC: 2025-08-30T21:00:00Z)
-    var eventDate = new Date('2025-08-30T21:00:00Z').getTime();
-    var now = new Date().getTime();
-    var distance = eventDate - now;
-    if (distance < 0) {
-        document.getElementById('countdown').innerHTML = '🎉 The event has started!';
-        return;
-    }
-    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    document.getElementById('countdown').innerHTML =
-        '<span style="color:#f39c12">' + days + '</span> DAYS '
-        + '<span style="color:#f39c12">' + hours + '</span> HOURS '
-        + '<span style="color:#f39c12">' + minutes + '</span> MINUTES '
-        + '<span style="color:#f39c12">' + seconds + '</span> SECONDS';
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
-</script>
-""", unsafe_allow_html=True)
+# --- Streamlit Native Countdown Timer (Top of Page) ---
+# Target: August 30, 2025, 2:00 PM PST (Philippine Standard Time)
+# Philippine Standard Time (PST) is UTC+8.
+EVENT_DATETIME = datetime(2025, 8, 30, 14, 0, 0)
+countdown_placeholder = st.empty()
+
+while True:
+    now = datetime.now()
+    distance = EVENT_DATETIME - now
+    total_seconds = int(distance.total_seconds())
+
+    if total_seconds <= 0:
+        countdown_placeholder.markdown("<div style='text-align:center;font-size:2rem;font-weight:bold;padding:1rem 0;color:#e67e22;'>🎉 The event has started!</div>", unsafe_allow_html=True)
+        break
+
+    days = total_seconds // (24 * 3600)
+    hours = (total_seconds % (24 * 3600)) // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+
+    countdown_text = f"""
+        <div style='text-align:center;font-size:2rem;font-weight:bold;padding:1rem 0;color:#e67e22;'>
+            <span style="color:#f39c12">{days}</span> DAYS
+            <span style="color:#f39c12">{hours}</span> HOURS
+            <span style="color:#f39c12">{minutes}</span> MINUTES
+            <span style="color:#f39c12">{seconds}</span> SECONDS
+        </div>
+    """
+    countdown_placeholder.markdown(countdown_text, unsafe_allow_html=True)
+    time.sleep(1) # Rerun the script every second to update the time
 
 # --- Fun Header Banner ---
 st.markdown('<div class="main-header">', unsafe_allow_html=True)
@@ -135,8 +138,6 @@ with tab_main:
                     if add_attendee(name, email):
                         st.success("🎊 Attendance confirmed! We'll see you there!")
                         st.balloons()  # Apply streamlit balloons after a successful registration
-                        # Note: The fallback JavaScript for confetti is already present and will run on mobile,
-                        # so no changes are needed to the existing logic.
                         st.cache_data.clear()
                         st.rerun()
                     else:
@@ -175,8 +176,8 @@ with tab_attendance:
                 'Names': attendee_list
             })
             fig_timeline = px.line(timeline_data, x='Day', y='Cumulative Attendees',
-                                    title="Registration Growth",
-                                    markers=True, hover_data=['Names'])
+                                     title="Registration Growth",
+                                     markers=True, hover_data=['Names'])
             fig_timeline.update_layout(height=300, showlegend=False)
             st.plotly_chart(fig_timeline, use_container_width=True)
         with viz_col2:
