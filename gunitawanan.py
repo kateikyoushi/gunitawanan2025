@@ -37,7 +37,6 @@ st.markdown("""
 
 # --- Non-Blocking Countdown Timer (Top of Page) ---
 # Target: August 30, 2025, 2:00 PM PST (Philippine Standard Time)
-# Current time in Roxas City, Western Visayas, Philippines (PST)
 EVENT_DATETIME = datetime(2025, 8, 30, 14, 0, 0)
 now = datetime.now()
 distance = EVENT_DATETIME - now
@@ -61,6 +60,8 @@ else:
         </div>
     """
     st.markdown(countdown_text, unsafe_allow_html=True)
+    # Add a small note about when the timer updates to manage user expectations
+    st.info("The countdown updates when the page reloads or you interact with the app. ✨")
 
 # --- Fun Header Banner ---
 st.markdown('<div class="main-header">', unsafe_allow_html=True)
@@ -131,8 +132,9 @@ with tab_main:
             if submitted:
                 if email and name:
                     if add_attendee(name, email):
-                        st.success("🎊 Attendance confirmed! We'll see you there!")
-                        st.balloons()  # Apply streamlit balloons after a successful registration
+                        # Show the confirmation overlay message
+                        st.success("🎊 **Attendance Confirmed!** Please refrain from overloading the database, Jayrose Bunda FUCK YOU!")
+                        st.balloons()
                         st.cache_data.clear()
                         st.rerun()
                     else:
@@ -145,6 +147,10 @@ with tab_main:
 with tab_attendance:
     st.header("👥 Attendance Dashboard")
     st.subheader("Registration Status")
+    
+    # Display the current date and time for context
+    st.info(f"**Current Date & Time:** {now.strftime('%A, %B %d, %Y at %I:%M:%S %p')}")
+
     col_metric1, col_metric2 = st.columns(2)
     with col_metric1:
         st.metric("Confirmed", num_attendees, help="Number of confirmed attendees")
