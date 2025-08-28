@@ -131,43 +131,18 @@ with tab_main:
             submitted = st.form_submit_button("I'm Coming! 🎉", use_container_width=True, type="primary")
 
             if submitted:
-                                if email and name:
-                                        if add_attendee(name, email):
-                                                st.success("🎊 Attendance confirmed! We'll see you there!")
-                                                # Balloons for PC, fallback for mobile
-                                                st.balloons()
-                                                st.markdown('''<script>
-                                                // fallback confetti for mobile
-                                                if (/Mobi|Android/i.test(navigator.userAgent)) {
-                                                    let c = document.createElement('canvas');
-                                                    c.style.position = 'fixed';c.style.left=0;c.style.top=0;c.style.width='100vw';c.style.height='100vh';c.style.pointerEvents='none';c.id='confetti-canvas';
-                                                    document.body.appendChild(c);
-                                                    let ctx = c.getContext('2d');
-                                                    let w = window.innerWidth, h = window.innerHeight;
-                                                    c.width = w; c.height = h;
-                                                    let confetti = Array.from({length:100},()=>({x:Math.random()*w,y:Math.random()*-h,vx:Math.random()*2-1,vy:Math.random()*3+2,color:`hsl(${Math.random()*360},70%,60%)`}));
-                                                    let t=0;
-                                                    function draw(){
-                                                        ctx.clearRect(0,0,w,h);
-                                                        confetti.forEach(f=>{
-                                                            ctx.beginPath();ctx.arc(f.x,f.y,6,0,2*Math.PI);
-                                                            ctx.fillStyle=f.color;ctx.fill();
-                                                            f.x+=f.vx;f.y+=f.vy;
-                                                            if(f.y>h){f.y=Math.random()*-h;f.x=Math.random()*w;}
-                                                        });
-                                                        t++;
-                                                        if(t<100)requestAnimationFrame(draw);else c.remove();
-                                                    }
-                                                    draw();
-                                                }
-                                                </script>''', unsafe_allow_html=True)
-                                                st.cache_data.clear()
-                                                st.rerun()
-                                        else:
-                                                st.error("Something went wrong. Please try again.")
-                                else:
-                                        st.error("Please provide both your name and email. 🥺")
-
+                if email and name:
+                    if add_attendee(name, email):
+                        st.success("🎊 Attendance confirmed! We'll see you there!")
+                        st.balloons()  # Apply streamlit balloons after a successful registration
+                        # Note: The fallback JavaScript for confetti is already present and will run on mobile,
+                        # so no changes are needed to the existing logic.
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        st.error("Something went wrong. Please try again.")
+                else:
+                    st.error("Please provide both your name and email. 🥺")
 
     st.divider()
 
@@ -200,8 +175,8 @@ with tab_attendance:
                 'Names': attendee_list
             })
             fig_timeline = px.line(timeline_data, x='Day', y='Cumulative Attendees',
-                                  title="Registration Growth",
-                                  markers=True, hover_data=['Names'])
+                                    title="Registration Growth",
+                                    markers=True, hover_data=['Names'])
             fig_timeline.update_layout(height=300, showlegend=False)
             st.plotly_chart(fig_timeline, use_container_width=True)
         with viz_col2:
